@@ -955,19 +955,61 @@ Main> filter (> 3) a
 
 ---
 
+# foldl
+
+```
+Prelude> :t foldl
+foldl :: Foldable t => (b -> a -> b) -> b -> t a -> b
+```
+
+- Foldable は 「畳み込み対応可能」という型クラス
+- listの場合は以下と同義
+
+```
+foldl :: (b -> a -> b) -> b -> [a] -> b
+```
+
+---
+
 # 例: foldl
 
+```haskell
+Prelude> foldl (+) 0 [1,2,3,4]
+10
+
+Prelude> foldl (*) 1 [1,2,3,4]
+24
+```
+
+---
+
+# 例: foldr
+
+```haskell
+Prelude> :t foldr
+foldr :: Foldable t => (a -> b -> b) -> b -> t a -> b
+
+Prelude> foldr (:) [] [1,2,3,4]  -- (:) cons関数.リストを作成する
+[1,2,3,4]
+```
 
 ---
 
 # foldingの例
 
-- sum
-- reverse
+```haskell
+-- listを走査する系の処理は foldingで記述できる
+Prelude> sum = foldl (+) 0
+Prelude> sum [1,2,3,4]
+10
 
-- map
-- Q: filter
+Prelude> reverse = foldl (flip (:)) []
+Prelude> reverse [1,2,3,4]
+[4,3,2,1]
 
+-- challenge: map / filter を foldingで書いてみよう
+-- hint: foldrをつかおう
+```
 ---
 
 # 高階関数のための便利機能
