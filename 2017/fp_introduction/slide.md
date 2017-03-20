@@ -550,6 +550,83 @@ False
 
 ---
 
+# 再帰による繰り返し
+
+---
+
+# 再帰による繰り返し
+
+- Haskellにはfor文やwhile文は存在しません
+- 繰り返しを利用する場合，再帰定義を使います
+  - 高校でやった「数列」を思い出してください
+  - ex: フィボナッチ数
+
+$$
+a_n = \left\{
+\begin{array}{ll}
+a_{n-1} + a_{n-2} & (n > 2) \\
+a_2 & (n = 2) \\
+a_1 & (n = 1)
+\end{array}
+\right.
+$$
+
+
+---
+
+# 例：フィボナッチ数を求めよう
+
+- Pythonで 手続き型っぽく書いてみます
+
+```python
+def fib(x):
+    a_1, a_2 = 1, 1
+
+    if x == 1:
+        return a_1
+    if x == 2:
+        return a_2
+
+    v = 0
+    i = 2
+    while i < x:
+        i += 1
+        v = a_1 + a_2
+        a_1 = a_2
+        a_2 = v
+    return v
+```
+
+---
+
+# 例：フィボナッチ数を求めよう
+
+- Haskellで書いてみます
+
+```haskell
+fib :: Int -> Int
+fib 1 = 1
+fib 2 = 1
+fib x = fib (x-1) + fib (x-2)
+```
+
+```haskell
+*Main> fib 1
+1
+*Main> fib 2
+1
+*Main> fib 3
+2
+*Main> fib 4
+3
+*Main> fib 5
+5
+*Main> fib 6
+8
+```
+
+---
+
 # 高階関数
 
 ---
@@ -557,6 +634,8 @@ False
 # 高階関数
 
 - 関数自体を値として利用する関数のこと
+
+- 以下を見ていきます
   - map
   - filter
   - fold
