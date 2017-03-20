@@ -23,6 +23,16 @@ scoreCheck x
   | x > 70 = "so so."
   | otherwise = "do your best ><"
 
+-- 関数合成
+addOne :: Int -> Int
+addOne x = x + 1
+
+addOneThenDouble :: Int -> Int
+addOneThenDouble x = doubleMe (addOne x)
+
+addOneThenDouble' :: Int -> Int
+addOneThenDouble' = doubleMe . addOne
+
 -- 型クラス
 equalInt :: Int -> Int -> Bool
 equalInt x y = x == y

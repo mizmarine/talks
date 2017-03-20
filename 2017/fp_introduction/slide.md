@@ -1,3 +1,4 @@
+autoscale: true
 slidenumbers: true
 # はじめる関数型プログラミング
 ## - Haskellではじめよう -
@@ -23,9 +24,19 @@ slidenumbers: true
 
 # agenda
 
-- 関数型プログラミングとは
-- Haskell入門
-- 高階関数を用いた抽象化
+1. 関数型プログラミングとは
+1. Haskell入門
+1. 再帰を用いた繰り返し
+1. 高階関数を用いた集合演算
+
+---
+
+# 本日の参考資料
+
+![inline 80%](./images/haskell.jpg)![inline 120%](./images/scala.jpg)
+
+^ すごいHaskellたのしく学ぼう！
+^ Scala関数型デザイン&プログラミング
 
 ---
 
@@ -39,7 +50,8 @@ slidenumbers: true
   - パラダイム: 考え方.捉え方
   - ex.手続き型/オブジェクト指向/etc..
 - 書き方が異なるだけ
-- 異なるパラダイムを学び，応用できるところは活かしていこう
+  - できること自体は変わりません
+  - 異なるパラダイムを学び，応用できるところは活かしていこう
 
 ---
 
@@ -49,13 +61,13 @@ slidenumbers: true
   - 「純粋関数」をベースとしたプログラミングのこと
 - 小さな「関数」をパーツとし，組み合わせて様々な処理を作る
   - linuxコマンドをイメージしてください
-
+  - cat, grep, sort, ...
 
 ---
 
-# 関数型プログラミングとは
+# 例: テキストファイルの操作
 
-- 例: テキストファイル中，「#」から始まるデータを取得する
+- 「#」から始まるデータを取得する
 
 ```
 cat slide.md | grep -e '^#' | sort | head -n 3
@@ -64,7 +76,7 @@ cat slide.md | grep -e '^#' | sort | head -n 3
 # Haskell入門
 ```
 
-- 手続き型の場合，arrayにしてifで場合分けして...みたいな感じで書くことになるかな
+- 手続き型で素直にかくと，listにしてloopまわして 1行ずつifで場合分けして...みたいな感じ
 
 ---
 
@@ -112,11 +124,13 @@ In [3]: print result
 None
 ```
 
+^処理をまとめたもの: procedure
+
 ---
 
 # 副作用
 
-- 関数呼び出し前後で 状態を書き換えること
+- 関数呼び出し前後で「状態」を書き換えること
 - ex
   - オブジェクトの状態更新
   - DBへの書き込み
@@ -150,9 +164,16 @@ Out[6]: 'masahiko'  # 状態が書き換わっている！
 
 - 副作用がない関数のこと
   - 数学における関数と同じもの
+
+$$
+f(x) = x^2
+$$
+
 - 何が嬉しい？
   - 同じ引数なら，いつでも同じ値を返す（参照透過性）
   - 同じ式は置換可能なので，等価性推論が容易
+  - 引数だけ考えれば良いので 状態意識したコード書かなくて良い
+
 
 ---
 
@@ -174,12 +195,17 @@ Out[6]: 'masahiko'  # 状態が書き換わっている！
 ![fit original](./images/haskell_logo.png)
 
 
+
 ---
 
 # Haskellとは
 
 > An advanced, purely functional programming language
 -- https://www.haskell.org
+
+
+- 純粋関数型言語として有名です
+- 以降 Haskell を用い関数型プログラミングに触れていきます
 
 ---
 
@@ -206,6 +232,7 @@ brew cask install haskell-platform
 - 他は公式サイトで調べてどうぞ
   - https://www.haskell.org/downloads
 - 公式サイト上オンラインでも試せます
+  - ...が，関数定義面倒なので手元で動かすのがお勧めです
 
 ![right](./images/ghci_sample.png)
 
@@ -377,10 +404,7 @@ Ok, modules loaded: Main.
 - 場合分け
   - パターンマッチ
   - ガード
-- 関数定義
-  - 関数合成
-  - カリー化
-  - 型クラス
+- 型クラス
 
 ---
 
@@ -551,11 +575,11 @@ False
 
 ---
 
-# 再帰による繰り返し
+# 再帰を用いた繰り返し
 
 ---
 
-# 再帰による繰り返し
+# 再帰を用いた繰り返し
 
 - Haskellにはfor文やwhile文は存在しません
 - 繰り返しを利用する場合，再帰定義を使います
@@ -696,7 +720,7 @@ fib x = fib (x-1) + fib (x-2)
 
 ---
 
-# 再帰による繰り返し
+# 再帰にを用いた繰り返し
 
 - 手続き型の繰り返しで書く場合
   - ループごとの状態を意識する必要がある
@@ -706,26 +730,366 @@ fib x = fib (x-1) + fib (x-2)
 
 ---
 
-# 高階関数
+# 高階関数を用いた集合演算
 
 ---
 
 # 高階関数
 
 - 関数自体を値として利用する関数のこと
-
-- 以下を見ていきます
+  - 関数型プログラミングの最初の一歩！
+- 関数型プログラマの武器
   - map
   - filter
   - fold
 
 ---
 
-# 参考資料
+# 「関数を引数に取る」とは？
 
-![inline 80%](./images/haskell.jpg)![inline 120%](./images/scala.jpg)
+- こんな関数を考えてみよう
+  - ある処理を引数に対し2回適用する
+- f(x) と x を引数として取り x に f(x)を2回適用した値を返す
+  - `twice` と名付ける
 
-^ すごいHaskellたのしく学ぼう！
-^ Scala関数型デザイン&プログラミング
+---
 
+# twice
+
+```haskell
+-- 「受け取った関数」をxに2回適用する関数
+twice :: (Int -> Int) -> Int -> Int
+twice f x = f (f x)
+
+*Main> twice succ 1
+3
+-- succ を 1に 2回適用する
+-- succ (succ 1) と同じ
+```
+
+---
+
+# twice
+
+- succ 以外にも `Int -> Int` な関数ならなんでも渡せる
+
+```haskell
+addThree :: Int -> Int
+addThree x = x + 3
+
+*Main> twice addThree 5
+11
+
+mulTwo :: Int -> Int
+mulTwo x = x * 2
+
+*Main> twice mulTwo 3
+12
+```
+
+---
+
+# twice
+
+- 共通パターン（2回繰り返す）に対し，具体的なロジックを切り替えるだけで 様々な処理が作れる
+- ロジックを切り替えられる，というのが高階関数のメリット
+  - ロジックの抽象化
+  - オブジェクト指向でいう strategy パターン
+
+---
+
+# 無名関数(ラムダ式)
+
+- その場でしか利用しない関数を定義できる
+  - 高階関数の引数として渡すことが多い
+  - 明示的に関数定義せずにロジックを表現できるのがメリット
+
+```haskell
+*Main> a = \x -> x + 2
+*Main> a 1
+3
+```
+
+---
+
+# twice * 無名関数
+
+
+- 無名関数を利用すると，高階関数がより便利になります
+
+```haskell
+*Main> twice (\x -> x + 1) 1
+3
+*Main> twice (\x -> x * 3) 4
+36
+```
+
+---
+
+# 部分適用とカリー化
+
+- 部分適用
+  - 複数引数の関数において，一部引数だけ適用した状態の関数
+  - Haskellの関数はすべて部分適用が可能
+- カリー化
+  - 複数引数の関数において，部分適用できるようにすること
+  - Haskellの関数はすべてカリー化されている
+
+---
+
+# 例: 部分適用
+
+```haskell
+*Main> :t (+ 1)  -- 引数に1を足す関数. addOne
+(+ 1) :: Num a => a -> a
+*Main> (+ 1) 3
+4
+
+*Main> :t (* 3)  -- 引数を3倍する関数. mulThree
+(* 3) :: Num a => a -> a
+*Main> (* 3) 2
+6
+```
+
+---
+
+# twice * カリー化関数
+
+- こちらも非常に高階関数と相性が良い
+
+```haskell
+*Main> twice (+1) 1
+3
+*Main> twice (*3) 4
+36
+```
+
+---
+
+# 集合と高階関数
+
+- xに対する処理 f(x)
+- xの集合に対してf(x)を一括で適用したい
+- 「一括で適用とする」というパターンにf(x)を渡す
+- 高階関数として表現できる！
+
+---
+
+# map
+
+- 集合の各要素に対し，f(x)による変換処理を行う高階関数
+  - [source](http://hackage.haskell.org/package/base-4.9.1.0/docs/Prelude.html#v:map)
+
+```haskell
+map :: (a -> b) -> [a] -> [b]
+map _ [] = []
+map f (x:xs) = f x : map f xs
+```
+
+---
+
+# 例: map
+
+```haskell
+*Main> a = [1,2,3,4,5]
+
+*Main> map succ a
+[2,3,4,5,6]
+*Main> map (\x -> x + 3) a
+[4,5,6,7,8]
+*Main> map (*2) a
+[2,4,6,8,10]
+```
+
+---
+
+# filter
+
+- 集合に対し，f(x)がTrueになる要素のみにする高階関数
+  - [source](http://hackage.haskell.org/package/base-4.9.1.0/docs/Prelude.html#v:filter)
+
+```haskell
+filter :: (a -> Bool) -> [a] -> [a]
+filter _pred []    = []
+filter pred (x:xs)
+  | pred x         = x : filter pred xs
+  | otherwise      = filter pred xs
+```
+
+---
+
+# 例: filter
+
+```haskell
+*Main> a = [1,2,3,4,5]
+
+*Main> filter even a  -- even: 引数が偶数の時 Trueを返す関数
+[2,4]
+*Main> filter (\x -> mod x 2 == 1) a  -- mod: 余りを返す関数
+[1,3,5]
+Main> filter (> 3) a
+[4,5]
+```
+
+---
+
+# fold
+
+- リストの「畳み込み」を行う
+  - 2引数関数fと初期値（アキュムレータ）acc，走査するリストxsを受取る
+  - f を acc とリストの最初の要素に適用し，新しいアキュムレータacc'とする
+  - f を acc' とリストの次の要素に適用し，新しいアキュムレータacc''とする
+  - コレを繰り返し，リストすべて舐めたときのアキュムレータを返す
+- リストを左から読む場合「左畳み込み」，逆の場合「右畳み込み」という
+
+---
+
+# 畳み込みのイメージ
+
+- 関数: (+), 初期値: 0, リスト: [1, 2, 3, 4]
+  - 0 + 1 = 1  # [1, 2, 3, 4]
+  - 1 + 2 = 3  # [2, 3, 4]
+  - 3 + 3 = 6  # [3, 4]
+  - 6 + 4 = 10 # [4]
+- result: 10
+
+---
+
+# 例: foldl
+
+
+---
+
+# foldingの例
+
+- sum
+- reverse
+
+- map
+- Q: filter
+
+---
+
+# 高階関数のための便利機能
+
+- 関数合成
+  - 既存の関数を組み合わせて，新しい関数を作成できます
+  - こんなイメージ
+
+$$
+h(x) = g(f(x))
+$$
+
+---
+
+# 例: 関数合成
+
+
+```haskell
+-- f(x)
+addOne :: Int -> Int
+addOne x = x + 1
+
+-- g(x)
+doubleMe :: Int -> Int
+doubleMe x = x * 2
+
+-- h(x) = g(f(x))
+addOneThenDouble :: Int -> Int
+addOneThenDouble x = doubleMe (addOne x)
+
+*Main> addOneThenDouble 4
+10
+*Main> 2 * (1 + 4)
+10
+```
+
+---
+
+# 関数合成
+
+
+```haskell
+-- 関数合成演算子を使うと よりシンプルに書けます
+-- ポイントフリースタイルという
+addOneThenDouble' :: Int -> Int
+addOneThenDouble' = doubleMe . addOne
+
+-- 部分適用との相性も抜群
+addOneThenDouble'' :: Int -> Int
+addOneThenDouble'' = (*2) . (+1)
+```
+
+---
+
+# 関数型プログラミングのパターン
+
+- 部分適用した関数を
+- ドット演算子で関数合成して
+- 高階関数に渡す
+
+というのがよくあるパターンです
+
+---
+
+# 例: 冒頭のfilter処理
+
+```
+cat slide.md | grep -e '^#' | sort | head -n 3
+```
+
+- 関数合成つかって書いてみましょう
+
+---
+
+# 例: 冒頭のfilter処理
+
+```haskell
+Prelude Data.List> text = ["# title1", "text1", "text2", "## subtitle1", "text3", "# title2", "text4" ]
+
+Prelude Data.List> startWithSharp = (==) '#' . head
+Prelude Data.List> take 3 . sort . filter startWithSharp $ text
+["# title1","# title2","## subtitle1"]
+```
+
+---
+
+# ここまでのまとめ
+
+- 高階関数
+  - 関数を値として扱う関数のこと
+  - 共通パターンをくくり出し，処理の抽象化を行える
+- 集合に対する演算として高階関数が便利
+  - map
+  - filter
+  - fold
+
+---
+
+# まとめ
+
+---
+
+# まとめ
+
+- Haskellを題材に関数型プログラミングの考え方を紹介しました
+  - 純粋関数を最小パーツとする
+  - 小さなパーツを組み合わせて大きな処理を作る
+  - 集合に対する演算を意識する
+- 手続き型/オブジェクト指向でも活かせると思うので，美味しいところを味わっていきましょう
+
+---
+
+# さらなる学びのために...
+
+- 型コンストラクタ
+  - List, Maybe, IO, etc..
+- 代数データ型
+  - data構文
+- 型クラス
+  - Functor, Monoid, Monad, etc..
+
+---
+
+# :tada: Happy Functional Life :tada:
 
