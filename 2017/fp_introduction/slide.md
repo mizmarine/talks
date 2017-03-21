@@ -1,4 +1,3 @@
-autoscale: true
 slidenumbers: true
 # はじめる関数型プログラミング
 ## - Haskellで感じる関数型のエッセンス -
@@ -16,8 +15,15 @@ slidenumbers: true
   - Pythonで広告配信書いてます
 - Like
   - :computer: Python / Haskell
-  - :book: ミステリ
   - :runner: 脱出ゲーム
+
+---
+
+# 伝えたいこと
+
+- 小さいパーツで大きな処理を作る関数型プログラミング
+- 「関数を値として扱う」ニュアンスを感じてください
+- 日々のプログラミングに活きたら幸いです
 
 ---
 
@@ -25,9 +31,9 @@ slidenumbers: true
 
 1. 関数型プログラミングとは
 1. Haskell入門
+1. パターンマッチとガード
 1. 再帰を用いた繰り返し
 1. 高階関数を用いた集合演算
-1. まとめ
 
 ---
 
@@ -51,8 +57,10 @@ slidenumbers: true
   - パラダイム: 考え方.捉え方
   - 例.手続き型/オブジェクト指向/etc..
 - 書き方、表現方法が異なるだけ
-  - 最終的にできること自体は変わりません（効率などは置いといて）
-  - 異なるパラダイムを学び，応用できるところは活かしていこう
+  - 最終的にできること自体は変わりません
+
+^ 変わりませんが，効率などは違います
+^ 異なるパラダイムを学び，応用できるところは活かしていこう
 
 ---
 
@@ -77,7 +85,8 @@ cat slide.md | grep -e '^#' | sort | head -n 3
 # Haskell入門
 ```
 
-- 手続き型で素直にかくと，listにしてloopまわして 1行ずつifで場合分けして...みたいな感じになるでしょう
+^ 手続き型で素直にかくと，listにしてloopまわして 1行ずつifで場合分けして...みたいな感じになるでしょう
+^ 大きい処理を小さい処理で組んでいく考え方
 
 ---
 
@@ -85,7 +94,7 @@ cat slide.md | grep -e '^#' | sort | head -n 3
 
 - 1つ１つのパーツ（関数）がコンパクトになる
   - テスト性，メンテナンス性が上がる
-- 再利用性も高い
+- 再利用性が高い
   - 例: grepした後にsedの変換処理はさもう
 - ではそもそも「関数」とはなにか？
 
@@ -101,11 +110,8 @@ In [1]: def addOne(x):
    ...:     return x + 1
    ...:
 
-In [2]: addOne(1)
-Out[2]: 2
-
-In [3]: addOne(3)
-Out[3]: 4
+In [2]: addOne(3)
+Out[2]: 4
 ```
 
 ---
@@ -120,80 +126,38 @@ Out[3]: 4
 
 ---
 
-# 例: オブジェクトの状態更新
-
-```python
-In [1]: class User(object):
-  ...:     def __init__(self, name):
-  ...:         self.name = name
-
-In [2]: def rename(user, new_name):
-  ...:     user.name = new_name
-
-In [3]: u = User('izumi')
-
-In [4]: u.name
-Out[4]: 'izumi'
-
-In [5]: rename(u, 'masahiko')
-
-In [6]: u.name
-Out[6]: 'masahiko'  # 状態が書き換わっている. rename関数は副作用をもつ
-```
-
----
-
 # 純粋関数
 
 - 副作用がない関数のこと
-  - 同じ引数なら，いつでも同じ値を返す（参照透過性）
+  - 同じ引数なら，いつでも同じ値を返す
   - 数学における関数と同じもの
 
 $$
 f(x) = x^2
 $$
 
-- 何が嬉しい？
-  - 同じ式は置換可能なので，等価性推論が容易
-  - 状態を意識したコードは複雑になりがちですよね
-
----
-
-# 副作用なしでどうプログラム書くの？
-
-- 副作用を持つ部分と副作用を持たない部分に切り分ける
-- 副作用持つ部分をなるべく薄くしていく
-  - 例: データIOは副作用、処理は純粋関数として処理
+- 詳しくは「参照等価性」などで調べてみてください
 
 ---
 
 # ここまでのまとめ
 
 - 関数型プログラミング
-  - 純粋関数を組み合わせて処理を記述するスタイルのこと
+  - 小さい純粋関数を組み合わせて処理を記述するスタイルのこと
 - 純粋関数
   - 副作用のない関数
-- 何が嬉しい？
-  - メンテナンス性，再利用性が高い
 
 ---
 
 # Haskell入門
-### - 10minで学ぶ基礎構文 -
+### - 5minで学ぶ基礎構文 -
 
 ---
 
-![fit original](./images/haskell_logo.png)
-
----
-
-# Haskellとは
-
-> An advanced, purely functional programming language
--- https://www.haskell.org
+![inline fit](./images/haskell_logo.png)
 
 
-- 純粋関数型言語として有名です
+- 純粋関数型言語
 - 以降 Haskell を用い関数型プログラミングに触れていきます
 
 ---
@@ -206,215 +170,99 @@ $$
 brew cask install haskell-platform
 ```
 
-- 他は公式サイトで調べてどうぞ
+- 他は公式サイトを参考
   - https://www.haskell.org/downloads
-- 公式サイト上オンラインでも試せます
-  - ...が，関数定義面倒なので手元で動かすのがお勧めです
-
-![right](./images/ghci_sample.png)
 
 ---
 
-# 数値計算
+# 基本
 
-```haskell
--- 演算子は優先度あり
-Prelude> 3 + 5
-8
-Prelude> 50 * 100 - 4999
-1
-Prelude> 100 - 10 * 9
-10
+- 数値計算
+- 論理値 / 等価性
+- リテラル
 
--- 負値は注意
-Prelude> 5 * -3
-
-interactive:4:1: error:
-    Precedence parsing error
-        cannot mix ‘*’ [infixl 7] and prefix `-' [infixl 6] in the same infix expression
-Prelude> 5 * (-3)
--15
-```
-
-^ 四則演算
-^ 関数優先度
-^ マイナスだけ注意
-
----
-
-# 論理演算
-
-```haskell
--- 論理演算
-Prelude> True && False
-False
-Prelude> True || False
-True
-Prelude> not True
-False
-
--- 比較演算
-Prelude> 1 == 1
-True
-Prelude> 1 /= 1 -- not equal
-False
-```
-
-^ and / or / not
-^ eq, not eq
-
----
-
-# リテラル
-
-```haskell
--- 文字
-Prelude> 'a'
-'a'
-
--- 文字列
-Prelude> "hoge"
-"hoge"
-
--- リスト
-Prelude> [1,2,3]
-[1,2,3]
-
--- 文字列は文字リストのsyntax sugar
-Prelude> "masa" == ['m', 'a', 's', 'a']
-True
-```
+^ ghciでライブでやる
+^ listもここで触れよう
 
 ---
 
 # 関数呼び出し
+
+- 関数名のあと空白おくと関数適用になる
 
 ```haskell
 -- succ: 1引数をうけて，「次に続くもの」を返す
--- 関数名のあと空白おくと関数適用になる
-Prelude> succ 1
-2
--- succ(1) とは書かない！
+Prelude> succ 2
+3
 
--- 文字の場合はアルファベット順
 Prelude> succ 'a'
 'b'
 
--- 「次に続くもの」が明確でない場合，error
-Prelude> succ "masa"
-
-interactive:33:1: error:
-    • No instance for (Enum [Char]) arising from a use of ‘succ’
-    • In the expression: succ "masa"
-      In an equation for ‘it’: it = succ "masa"
 ```
-
-^ このへんからちょこちょこ重要
-^ 関数名に空白開けると関数適用
-
----
-
-# 関数呼び出し
-
-```haskell
--- sringを改行ごとに区切る関数
-Prelude> lines "aaa\niii\nuuu"
-["aaa","iii","uuu"]
-
--- 外部モジュールのコードはimportして利用できる
-Prelude> import Data.Char
-Prelude Data.Char> toUpper 'a'
-'A'
-```
-
 
 ---
 
 # 2引数関数
 
+- 複数引数の場合も同じように空白をあける
+
 ```haskell
 -- max: 2引数を受け，大きい方を返す
 Prelude> max 3 5
 5
--- max(3,5) とは書かない！
 
 Prelude> max 'a' 'b'
 'b'
 
--- listの場合，先頭から比較していく
-Prelude> max [1,2,3] [2,1]
-[2,1]
-Prelude> max "hoge" "huga"
-"huga"
-```
-
----
-
-# 中置関数
-
-- `f x y` の形で適用する関数を前置関数という
-- `x op y` の形で適用する中置関数を中置関数という
-
-```haskell
--- (+) 関数
-Prelude> 1 + 2
-3
-
--- (:) 関数
--- 要素とリストを受け、新たなリストを返す
-Prelude> 1 : []
-[1]
-Prelude> 1 : 2 : 3 : []
-[1,2,3]
-```
-
----
-
-# 型の確認
-
-```haskell
--- :type x もしくは :t x で xの型を調べられる
-Prelude> :type 'a'
-'a' :: Char
-Prelude> :t "masa"
-"masa" :: [Char]
-
--- 関数の型をみることもできる
-Prelude> :t lines
-lines :: String -> [String]
-
-Prelude> import Data.Char
-Prelude Data.Char> :t toUpper
-toUpper :: Char -> Char  -- Char型を受けてChar型を返す関数
 ```
 
 ---
 
 # 関数定義
 
+- 型定義と実装を書きます
+
 ```haskell
 -- sample.hs
-doubleMe :: Int -> Int  -- Intを受けて Intを返す という意味
+
+-- 型定義: IntをうけてIntを返す，の意味
+doubleMe :: Int -> Int
+-- 実装: 左辺が引数，右辺が返り値
 doubleMe x = x * 2
 ```
 
+^ 型定義はなくても動きますが，書いておくことを推奨されています
+
+---
+
+# 関数利用
+
 ```haskell
--- ghciから読み込み
 Prelude> :l sample.hs
-[1 of 1] Compiling Main             ( sample.hs, interpreted )
+[1 of 1] Compiling Main        ( sample.hs, interpreted )
 Ok, modules loaded: Main.
+
 *Main> doubleMe 3
 6
 ```
 
+
 ---
 
-# 便利機能
+# パターンマッチとガード
+### - ifを使わない場合分け -
 
-- 場合分け
-  - パターンマッチ
-  - ガード
-- 型クラス
+---
+
+# 場合分けの便利記法
+
+
+- パターンマッチ
+- ガード
+
+を紹介します
+
+^ Haskellにもif文がありますが，これらを使うと便利です
 
 ---
 
@@ -449,14 +297,13 @@ dayOfTheWeek 6 = "Saturday"
 dayOfTheWeek otherwise = "unknown"
 ```
 
+^ いわゆるswitch文みたいなもん
+
 ---
 
 # パターンマッチ
 
 ```haskell
-Prelude> :l sample.hs
-[1 of 1] Compiling Main             ( sample.hs, interpreted )
-Ok, modules loaded: Main.
 *Main> dayOfTheWeek 0
 "Sunday"
 *Main> dayOfTheWeek 4
@@ -495,14 +342,13 @@ scoreCheck x
   | otherwise = "do your best >_<"
 ```
 
+^ パターンマッチでマッチさせたxをガードで再利用できます
+
 ---
 
 # ガード
 
 ```haskell
-Prelude> :l sample.hs
-[1 of 1] Compiling Main             ( sample.hs, interpreted )
-Ok, modules loaded: Main.
 *Main> scoreCheck 100
 "Excellent!!"
 *Main> scoreCheck 85
@@ -513,76 +359,34 @@ Ok, modules loaded: Main.
 
 ---
 
-# 型クラス
+# 例：うるう年判定してみよう
 
-- 同じような処理の関数も，型が違ったら適用できない
+- 西暦を与えられて，うるう年かどうか判定する関数を考える
+- [うるう年](https://ja.wikipedia.org/wiki/%E9%96%8F%E5%B9%B4)
+  - 西暦年が4で割り切れる年は閏年。
+  - ただし、西暦年が100で割り切れる年は平年。
+  - ただし、西暦年が400で割り切れる年は閏年。
+
+---
+
+# 例：うるう年判定してみよう
 
 ```haskell
-equalInt :: Int -> Int -> Bool
-equalInt x y = x == y
-
-*Main> equalInt 1 1
-True
-
--- 'a', 'b' は Int ではないのでerror
-*Main> equalInt 'a' 'b'
-interactive:4:10: error:
-    • Couldn't match expected type ‘Int’ with actual type ‘Char’
-    • In the first argument of ‘equalInt’, namely ‘'a'’
-      In the expression: equalInt 'a' 'b'
-      In an equation for ‘it’: it = equalInt 'a' 'b'
+isLeapYear :: Int -> Bool
+isLeapYear x
+  | mod x 400 == 0 = True
+  | mod x 100 == 0 = False
+  | mod x 4 == 0 = True
+  | otherwise = False
 ```
 
 ---
 
-# 型クラス
-
-- 具体的な型(Int, Char,..)が どのような性質をもつか，を示すもの
-  - 同値比較ができるか，順序比較ができるか..など
-  - java や golang における interface に近い
-- 例: Eq型クラス
-  - `==` 演算子で比較演算ができるか
-  - Int, Charは `1 == 1`, `'a' == 'b'` という比較演算ができる
-  - Int, Char は Eq型クラスに属する，という
+# 慣れない文法で疲れませんか？
 
 ---
 
-# 型クラス
-
-- equalIntを Eq型クラスに属する型を対象としてする
-
-```haskell
-equalEq :: (Eq a) => a -> a -> Bool
-equalEq x y = x == y
-
-*Main> equalEq 1 1
-True
-*Main> equalEq 'a' 'b'
-False
-```
-
----
-
-# その他型クラスの例
-
-- Ord型クラス
-  - 順序比較計算( `>` )ができるもの
-- Enum型クラス
-  - 値を列挙できるもの
-- Num型クラス
-  - 数値演算( `+`, `*`, etc..)ができるもの
-
----
-
-# Haskell入門
-
-- 基本構文
-  - 数値, 真偽値, 文字列, リスト
-  - 関数呼び出し, 関数定義
-- 便利構文
-  - パターンマッチ
-  - ガード
-- 型クラス
+# 一旦休憩しましょう :coffee:
 
 ---
 
@@ -591,32 +395,62 @@ False
 
 ---
 
-# 再帰を用いた繰り返し
 
-- Haskellにはfor文やwhile文は存在しません
+#  Haskellにはfor文やwhile文は存在しません
 - 繰り返しを利用する場合，再帰定義を使います
   - 高校でやった「数列」を思い出してください
-  - 例: フィボナッチ数
+  - 例: フィボナッチ数列
 
 $$
 a_n = \left\{
 \begin{array}{ll}
 a_{n-1} + a_{n-2} & (n > 2) \\
-a_2 & (n = 2) \\
-a_1 & (n = 1)
+1 & (n = 1,2)
 \end{array}
 \right.
 $$
 
 ---
 
-# 例1：リストの合計を求めてみよう
+# 例：リストの合計を求めてみよう
 
 - 配列 a<sub>n</sub>の合計 S<sub>n</sub> を求めてみよう
 
 $$
 S_n = a_1 + a_2 + ... + a_n
 $$
+
+- 要素を一つずつ足していけばよさそう
+
+---
+
+# 例：リストの合計を求めてみよう
+
+- Pythonで 手続き型っぽく書いてみます
+
+```python
+def mysum(xs):
+  v = 0
+  for i in xs:
+    v += i
+  return v
+```
+
+---
+
+# 再帰的に考えてみよう
+
+- ポイントは基底部と再帰部を見極めること
+- リストに要素がない時
+  - 合計はゼロとして良さそう
+- リストに要素がある時
+  - 先頭要素を，先頭要素以外の合計に足せばよさそう
+
+---
+
+# 式にするとこんな感じ
+
+- S<sub>n</sub> はこう考える事ができる
 
 $$
 S_n = \left\{
@@ -629,113 +463,16 @@ $$
 
 ---
 
-# 例1：リストの合計を求めてみよう
-
-- Pythonで 手続き型っぽく書いてみます
-
-```python
-def mysum(xs):
-  v = 0
-  for i in xs:
-    v += i
-  return v
-
-if __name__ == '__main__':
-  print mysum([1, 2, 3, 4, 5])  # 15
-```
-
----
-
-# 例1：リストの合計を求めてみよう
-
-- Haskellで再帰的に書いてみます
-  - ポイントは基底部と再帰部を見極めること
+# 再帰的なリスト合計
 
 ```haskell
 mysum :: [Int] -> Int
 mysum [] = 0
 mysum (x:xs) = x + mysum xs
-
-main = do
-    print $ mysum [1,2,3,4,5]  -- 15
 ```
 
----
-
-# 例2：フィボナッチ数を求めよう
-
-- 定義再掲
-
-$$
-a_n = \left\{
-\begin{array}{ll}
-a_{n-1} + a_{n-2} & (n > 2) \\
-a_2 & (n = 2) \\
-a_1 & (n = 1)
-\end{array}
-\right.
-$$
-
----
-
-# 例2：フィボナッチ数を求めよう
-
-- Pythonで 手続き型っぽく書いてみます
-
-```python
-def fib(x):
-    a_1, a_2 = 1, 1
-
-    if x == 1:
-        return a_1
-    if x == 2:
-        return a_2
-
-    v = 0
-    i = 2
-    while i < x:
-        i += 1
-        v = a_1 + a_2
-        a_1 = a_2
-        a_2 = v
-    return v
-```
-
-^ 作為的ですが
-^ 初期条件のif
-^ 繰り返し部分のループ
-^ 返り値を保存する変数
-
----
-
-# 例2：フィボナッチ数を求めよう
-
-- Haskellで再帰的に書いてみます
-
-```haskell
-fib :: Int -> Int
-fib 1 = 1
-fib 2 = 1
-fib x = fib (x-1) + fib (x-2)
-```
-
-```haskell
-*Main> fib 1
-1
-*Main> fib 2
-1
-*Main> fib 3
-2
-*Main> fib 4
-3
-*Main> fib 5
-5
-*Main> fib 6
-8
-```
-
-^ 一方 定義を書いただけです
-^ 具体的に計算する必要はないです
+^ リストへのパターンマッチ
+^ 定義そのもの！
 
 ---
 
@@ -746,6 +483,8 @@ fib x = fib (x-1) + fib (x-2)
 - 再帰的な繰り返しで書く場合
   - 数学的な定義そのままで書けることが多い
   - 基底部と再帰部を記述するだけ
+
+^もし興味あれば冒頭のフィボナッチ数列を再帰で解いてみてください！
 
 ---
 
@@ -786,7 +525,6 @@ twice f x = f (f x)
 *Main> twice succ 1
 3
 -- succ を 1に 2回適用する
--- succ (succ 1) と同じ
 ```
 
 ---
@@ -798,13 +536,11 @@ twice f x = f (f x)
 ```haskell
 addThree :: Int -> Int
 addThree x = x + 3
-
 *Main> twice addThree 5
 11
 
 mulTwo :: Int -> Int
 mulTwo x = x * 2
-
 *Main> twice mulTwo 3
 12
 ```
@@ -817,7 +553,8 @@ mulTwo x = x * 2
 - ロジックを切り替えられる，というのが高階関数のメリット
   - ロジックの抽象化
   - オブジェクト指向でいう strategy パターン
-- このように関数を値として扱えることを、「関数がファーストクラスオブジェクトである」という
+
+^ このように関数を値として扱えることを「関数がファーストクラスオブジェクトである」という
 
 ---
 
@@ -825,8 +562,6 @@ mulTwo x = x * 2
 
 - twiceでしか利用しない関数をわざわざ定義するのが面倒？
 - その場でしか利用しない関数を定義できる
-  - 高階関数の引数として渡すことが多い
-  - 明示的に関数定義せずにロジックを表現できるのがメリット
 
 ```haskell
 *Main> a = \x -> x + 2
@@ -849,14 +584,12 @@ mulTwo x = x * 2
 
 ---
 
-# 部分適用とカリー化
+# 部分適用
 
 - 部分適用
   - 複数引数の関数において，一部引数だけ適用した状態の関数
   - Haskellの関数はすべて部分適用が可能
-- カリー化
-  - 複数引数の関数において，部分適用できるようにすること
-  - Haskellの関数はすべてカリー化されている
+- 詳しくは「カリー化」と合せて調べてみてください
 
 ---
 
@@ -876,7 +609,7 @@ mulTwo x = x * 2
 
 ---
 
-# twice * カリー化関数
+# twice * 部分適用関数
 
 - こちらも非常に高階関数と相性が良い
 
@@ -956,6 +689,14 @@ Main> filter (> 3) a
 
 ---
 
+# mapやfilterのメリット
+
+- ループで集合に演算する場合，具体処理を読まないと変換なのか，フィルタなのか，そうでないのか わからない
+- mapは変換，filterはフィルタと目的（パターン）がはっきりしている
+- コードが読みやすくなる
+
+---
+
 # fold
 
 - リストの「畳み込み」を行う
@@ -1015,18 +756,371 @@ foldr :: Foldable t => (a -> b -> b) -> b -> t a -> b
 Prelude> foldr (:) [] [1,2,3,4]  -- (:) cons関数.リストを作成する
 [1,2,3,4]
 ```
+---
+
+# 関数合成
+
+- 既存の関数を組み合わせて，新しい関数を作成できます
+
+```haskell
+-- 1を足してから2倍する関数
+addOneThenDouble' :: Int -> Int
+addOneThenDouble' = doubleMe . addOne
+
+-- もちろん部分適用とも併用できます
+addOneThenDouble'' :: Int -> Int
+addOneThenDouble'' = (*2) . (+1)
+```
+
 
 ---
 
-# 高階関数のための便利機能
+# 例: 冒頭のfilter処理
 
-- 関数合成
-  - 既存の関数を組み合わせて，新しい関数を作成できます
-  - こんなイメージ
+```
+cat slide.md | grep -e '^#' | sort | head -n 3
+```
+
+- 最後にコレを今まで学んだ要素で作ってみましょう
+
+---
+
+# 例: 冒頭のfilter処理
+
+```haskell
+Prelude Data.List> text = ["# title1", "text1", "text2", "## subtitle1", "text3", "# title2", "text4" ]
+
+Prelude Data.List> startWithSharp = (==) '#' . head
+Prelude Data.List> take 3 . sort . filter startWithSharp $ text
+["# title1","# title2","## subtitle1"]
+```
+
+---
+
+# 高階関数を用いた集合演算
+
+- 高階関数
+  - 関数を値として扱う関数のこと
+  - 共通パターンをくくり出し，処理の抽象化を行える
+- 集合に対する演算として高階関数が便利
+  - map, filter など 意図が明確になる
+
+^ 単一要素の処理さえできてしまえば、集合になっても問題なく処理できる
+^ データソースの集合に対し、変換/フィルタ を簡単に適用できる
+^ map/filterなどで書いてあれば、forとして書かれるよりも意図が明白になる
+
+---
+
+# まとめ
+
+---
+
+# まとめ
+
+- Haskellを題材に関数型プログラミングの考え方を紹介した
+  - 純粋関数を最小パーツとする
+  - 小さなパーツを組み合わせて大きな処理を作る
+- 関数をファーストクラスオブジェクトとして扱えるなら応用可
+  - 日々の開発でも活貸してみてください
+
+^ 今回紹介した話は関数型言語でしかできない、というものではないです
+
+---
+
+# Haskellさらなる学びのためのキーワード
+
+- 型コンストラクタ: List, Maybe, IO, etc..
+- 独自データ型: data構文, class構文, instance構文
+- 型クラス: Functor, Monoid, Monad, etc..
+
+^ 興味あったらこの辺のキーワードから調べていくと良いです
+^ まずはMaybeあたり触ってみると良いでしょう
+
+---
+
+# :tada: Happy Functional Life :tada:
+
+---
+
+# 補足
+
+---
+
+# foldingでmap/filter
+
+```haskell
+mymap :: (a -> b) -> [a] -> [b]
+mymap f as = foldr step [] as
+  where
+    step a acc = f a : acc
+
+```
+
+---
+
+# foldingでmap/filter
+
+```haskell
+myfilter :: (a -> Bool) -> [a] -> [a]
+myfilter f as = foldr step [] as
+  where
+    step a acc
+      | f a = a : acc
+      | otherwise = acc
+```
+
+---
+
+
+# 副作用なしでどうプログラム書くの？
+
+- 副作用を持つ部分と副作用を持たない部分に切り分ける
+- 副作用持つ部分をなるべく薄くしていく
+  - 例: データIOは副作用、処理は純粋関数として処理
+
+---
+
+# 数値計算
+
+```haskell
+-- 演算子は優先度あり
+Prelude> 3 + 5
+8
+Prelude> 50 * 100 - 4999
+1
+Prelude> 100 - 10 * 9
+10
+
+-- 負値は注意
+Prelude> 5 * -3
+
+interactive:4:1: error:
+    Precedence parsing error
+        cannot mix ‘*’ [infixl 7] and prefix `-' [infixl 6] in the same infix expression
+Prelude> 5 * (-3)
+-15
+```
+
+^ 四則演算
+^ 関数優先度
+^ マイナスだけ注意
+
+---
+
+# 論理演算
+
+```haskell
+-- 論理演算
+Prelude> True && False
+False
+Prelude> True || False
+True
+Prelude> not True
+False
+
+-- 比較演算
+Prelude> 1 == 1
+True
+Prelude> 1 /= 1 -- not equal
+False
+```
+
+^ and / or / not
+^ eq, not eq
+
+---
+
+# リテラル
+
+```haskell
+-- 文字
+Prelude> 'a'
+'a'
+
+-- 文字列
+Prelude> "hoge"
+"hoge"
+
+```
+
+---
+
+# リテラル
+
+```haskell
+-- リスト
+Prelude> []
+[]
+
+Prelude> [1,2,3]
+[1,2,3]
+
+-- listはconsの構文糖衣
+Prelude> 1:[]
+[1]
+
+Prelude> 1:2:3:[]
+[1,2,3]
+
+-- 文字列は文字リストのsyntax sugar
+Prelude> "masa" == ['m', 'a', 's', 'a']
+True
+```
+
+---
+
+# 型の確認
+
+```haskell
+-- :type x もしくは :t x で xの型を調べられる
+Prelude> :type 'a'
+'a' :: Char
+Prelude> :t "masa"
+"masa" :: [Char]
+
+-- 関数の型をみることもできる
+Prelude> :t lines
+lines :: String -> [String]
+
+Prelude> import Data.Char
+Prelude Data.Char> :t toUpper
+toUpper :: Char -> Char  -- Char型を受けてChar型を返す関数
+```
+
+---
+
+# 中置関数
+
+- `f x y` の形で適用する関数を前置関数という
+- `x op y` の形で適用する中置関数を中置関数という
+
+```haskell
+-- (+) 関数
+Prelude> 1 + 2
+3
+```
+
+---
+
+# 型クラス
+
+- 同じような処理の関数も，型が違ったら適用できない
+
+```haskell
+equalInt :: Int -> Int -> Bool
+equalInt x y = x == y
+
+*Main> equalInt 1 1
+True
+
+-- 'a', 'b' は Int ではないのでerror
+*Main> equalInt 'a' 'b'
+interactive:4:10: error:
+    • Couldn't match expected type ‘Int’ with actual type ‘Char’
+    • In the first argument of ‘equalInt’, namely ‘'a'’
+      In the expression: equalInt 'a' 'b'
+      In an equation for ‘it’: it = equalInt 'a' 'b'
+```
+
+---
+
+# 型クラス
+
+- 具体的な型(Int, Char,..)が どのような性質をもつか，を示すもの
+  - 同値比較ができるか，順序比較ができるか..など
+  - java や golang における interface に近い
+- 例: Eq型クラス
+  - `==` 演算子で比較演算ができるか
+  - Int, Charは `1 == 1`, `'a' == 'b'` という比較演算ができる
+  - Int, Char は Eq型クラスに属する，という
+
+---
+
+# 型クラス
+
+- equalIntを Eq型クラスに属する型を対象としてする
+
+```haskell
+equalEq :: (Eq a) => a -> a -> Bool
+equalEq x y = x == y
+
+*Main> equalEq 1 1
+True
+*Main> equalEq 'a' 'b'
+False
+```
+
+---
+
+# その他型クラスの例
+
+- Ord型クラス
+  - 順序比較計算( `>` )ができるもの
+- Enum型クラス
+  - 値を列挙できるもの
+- Num型クラス
+  - 数値演算( `+`, `*`, etc..)ができるもの
+
+---
+
+# 例2：フィボナッチ数を求めよう
+
+- 定義
 
 $$
-h(x) = g(f(x))
+a_n = \left\{
+\begin{array}{ll}
+a_{n-1} + a_{n-2} & (n > 2) \\
+1 & (n = 1,2) \\
+\end{array}
+\right.
 $$
+
+---
+
+# 例2：フィボナッチ数を求めよう
+
+- Pythonで 手続き型っぽく書いてみます
+
+```python
+def fib(x):
+    a_1, a_2 = 1, 1
+
+    if x == 1:
+        return a_1
+    if x == 2:
+        return a_2
+
+    v = 0
+    i = 2
+    while i < x:
+        i += 1
+        v = a_1 + a_2
+        a_1 = a_2
+        a_2 = v
+    return v
+```
+
+^ 作為的ですが
+^ 初期条件のif
+^ 繰り返し部分のループ
+^ 返り値を保存する変数
+
+---
+
+# 例2：フィボナッチ数を求めよう
+
+- Haskellで再帰的に書いてみます
+
+```haskell
+fib :: Int -> Int
+fib 1 = 1
+fib 2 = 1
+fib x = fib (x-1) + fib (x-2)
+```
+
+^ 一方 定義を書いただけです
+^ 具体的に計算する必要はないです
 
 ---
 
@@ -1085,105 +1179,4 @@ Prelude> reverse [1,2,3,4]
 -- hint: foldrをつかおう
 ```
 
----
 
-# Haskellプログラミングのパターン
-
-- 部分適用した関数を
-- ドット演算子で関数合成して
-- 高階関数に渡す
-
-というのがよくあるパターンです
-
----
-
-# 例: 冒頭のfilter処理
-
-```
-cat slide.md | grep -e '^#' | sort | head -n 3
-```
-
-- 関数合成つかって書いてみましょう
-
----
-
-# 例: 冒頭のfilter処理
-
-```haskell
-Prelude Data.List> text = ["# title1", "text1", "text2", "## subtitle1", "text3", "# title2", "text4" ]
-
-Prelude Data.List> startWithSharp = (==) '#' . head
-Prelude Data.List> take 3 . sort . filter startWithSharp $ text
-["# title1","# title2","## subtitle1"]
-```
-
----
-
-# 高階関数を用いた集合演算
-
-- 高階関数
-  - 関数を値として扱う関数のこと
-  - 共通パターンをくくり出し，処理の抽象化を行える
-- 集合に対する演算として高階関数が便利
-  - ある型xに対する処理f(x)があるとき
-  - mapなどを利用すれば 明示的にループ処理書かなずに List[x]を処理できる
-
-^ 単一要素の処理さえできてしまえば、集合になっても問題なく処理できる
-^ データソースの集合に対し、変換/フィルタ を簡単に適用できる
-^ map/filterなどで書いてあれば、forとして書かれるよりも意図が明白になる
-
----
-
-# まとめ
-
----
-
-# まとめ
-
-- Haskellを題材に関数型プログラミングの考え方を紹介した
-  - 純粋関数を最小パーツとする
-  - 小さなパーツを組み合わせて大きな処理を作る
-  - 集合に対する演算を意識する
-- この概念は、関数をファーストクラスオブジェクトとして扱えるなら応用が効く
-  - 日々の開発でも活かせると思うので，美味しいところを味わってください
-
-^ 今回紹介した話は関数型言語でしかできない、というものではないです
-
----
-
-# さらなる学びのためのキーワード
-
-- 型コンストラクタ
-  - List, Maybe, IO, etc..
-- 代数データ型
-  - data構文
-- 型クラス
-  - class構文, instance構文
-  - Functor, Monoid, Monad, etc..
-
-^ 興味あったらこの辺のキーワードから調べていくと良いです
-^ まずはMaybeあたり触ってみると良いでしょう
-
----
-
-# :tada: Happy Functional Life :tada:
-
----
-
-# おかわり
-
-- foldingでmap/filter
-
-```haskell
-mymap :: (a -> b) -> [a] -> [b]
-mymap f as = foldr step [] as
-  where
-    step a acc = f a : acc
-
-myfilter :: (a -> Bool) -> [a] -> [a]
-myfilter f as = foldr step [] as
-  where
-    step a acc
-      | f a = a : acc
-      | otherwise = acc
-```
