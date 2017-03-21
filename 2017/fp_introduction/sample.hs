@@ -3,15 +3,15 @@ doubleMe :: Int -> Int
 doubleMe x = x * 2
 
 -- pattern match
-weekday :: Int -> String
-weekday 0 = "Sunday"
-weekday 1 = "Monday"
-weekday 2 = "Tuesday"
-weekday 3 = "Wednesday"
-weekday 4 = "Thursday"
-weekday 5 = "Friday"
-weekday 6 = "Saturday"
-weekday otherwise = "unknown"
+dayOfTheWeek :: Int -> String
+dayOfTheWeek 0 = "Sunday"
+dayOfTheWeek 1 = "Monday"
+dayOfTheWeek 2 = "Tuesday"
+dayOfTheWeek 3 = "Wednesday"
+dayOfTheWeek 4 = "Thursday"
+dayOfTheWeek 5 = "Friday"
+dayOfTheWeek 6 = "Saturday"
+dayOfTheWeek otherwise = "unknown"
 
 
 -- guard
@@ -21,7 +21,7 @@ scoreCheck x
   | x > 90 = "very good!"
   | x > 80 = "good."
   | x > 70 = "so so."
-  | otherwise = "do your best ><"
+  | otherwise = "do your best >_<"
 
 -- 関数合成
 addOne :: Int -> Int
