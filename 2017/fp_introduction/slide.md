@@ -699,11 +699,9 @@ Main> filter (> 3) a
 
 # fold
 
-- リストの「畳み込み」を行う
-  - 2引数関数fと初期値（アキュムレータ）acc，走査するリストxsを受取る
-  - f を acc とリストの最初の要素に適用し，新しいアキュムレータacc'とする
-  - f を acc' とリストの次の要素に適用し，新しいアキュムレータacc''とする
-  - コレを繰り返し，リストすべて舐めたときのアキュムレータを返す
+- リストの「畳み込み」
+  - 2引数関数fと初期値acc，走査するリストxsを受取る
+  - リストを読みながらfをどんどん適用していく
 - リストを左から読む場合「左畳み込み」，逆の場合「右畳み込み」という
 
 ---
@@ -719,23 +717,13 @@ Main> filter (> 3) a
 
 ---
 
-# foldl
+# 例: foldl
 
-```
-Prelude> :t foldl
-foldl :: Foldable t => (b -> a -> b) -> b -> t a -> b
-```
+- リストの左の値から適用していく
 
-- Foldable は 「畳み込み対応可能」という型クラス
-- listの場合は以下と同義
-
-```
+```haskell
 foldl :: (b -> a -> b) -> b -> [a] -> b
 ```
-
----
-
-# 例: foldl
 
 ```haskell
 Prelude> foldl (+) 0 [1,2,3,4]
@@ -748,6 +736,8 @@ Prelude> foldl (*) 1 [1,2,3,4]
 ---
 
 # 例: foldr
+
+- リストの右の値から適用していく
 
 ```haskell
 Prelude> :t foldr
@@ -772,7 +762,6 @@ addOneThenDouble'' :: Int -> Int
 addOneThenDouble'' = (*2) . (+1)
 ```
 
-
 ---
 
 # 例: 冒頭のfilter処理
@@ -788,10 +777,9 @@ cat slide.md | grep -e '^#' | sort | head -n 3
 # 例: 冒頭のfilter処理
 
 ```haskell
-Prelude Data.List> text = ["# title1", "text1", "text2", "## subtitle1", "text3", "# title2", "text4" ]
-
+Prelude Data.List> text <- readFile "slide.md"
 Prelude Data.List> startWithSharp = (==) '#' . head
-Prelude Data.List> take 3 . sort . filter startWithSharp $ text
+Prelude Data.List> take 3 . sort . filter startWithSharp . filter (/= "") $ text
 ["# title1","# title2","## subtitle1"]
 ```
 
