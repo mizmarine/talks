@@ -14,6 +14,15 @@ dayOfTheWeek 6 = "Saturday"
 dayOfTheWeek otherwise = "unknown"
 
 
+isEmpty :: [Int] -> Bool
+isEmpty [] = True
+isEmpty (x:xs) = False
+
+hasZeroValue :: (Int, Int) -> Bool
+hasZeroValue (_, 0) = True
+hasZeroValue (0, _) = True
+hasZeroValue _ = False
+
 -- guard
 scoreCheck :: Int -> String
 scoreCheck x
