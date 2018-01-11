@@ -11,7 +11,7 @@ slidenumbers: true
 
 - 泉 雅彦(@mizmarine)
 - 株式会社VOYAGE GROUP
-  - そろそろ2年目終わります
+  - そろそろ2年目終わりま~~す~~した
   - Pythonで広告配信書いてます
 - Like
   - :computer: Python / Haskell
@@ -314,6 +314,24 @@ dayOfTheWeek otherwise = "unknown"
 
 ---
 
+# パターンマッチ
+
+- 構造をベースにしたマッチもできる（むしろこれが本質
+
+```haskell
+isEmpty :: [Int] -> Bool
+isEmpty [] = True
+isEmpty (x:xs) = False
+
+hasZeroValue :: (Int, Int) -> Bool
+hasZeroValue (_, 0) = True
+hasZeroValue (0, _) = True
+hasZeroValue _ = False
+```
+
+
+---
+
 # ガード
 
 - マッチした引数の条件分けができる
@@ -495,7 +513,7 @@ mysum (x:xs) = x + mysum xs
 
 # 高階関数
 
-- 関数を引数として取る関数のこと
+- 「関数を引数として取る」関数のこと
   - 関数型プログラミングの最初の一歩！
 - 様々な高階関数が関数型プログラマの武器
   - map
@@ -809,7 +827,7 @@ Prelude Data.List> take 3 . sort . filter startWithSharp . filter (/= "") $ text
   - 純粋関数を最小パーツとする
   - 小さなパーツを組み合わせて大きな処理を作る
 - 関数をファーストクラスオブジェクトとして扱えるなら応用可
-  - 日々の開発でも活貸してみてください
+  - 日々の開発でも活かしてみてください
 
 ^ 今回紹介した話は関数型言語でしかできない、というものではないです
 
@@ -819,10 +837,10 @@ Prelude Data.List> take 3 . sort . filter startWithSharp . filter (/= "") $ text
 
 - 型コンストラクタ: List, Maybe, IO, etc..
 - 独自データ型: data構文, class構文, instance構文
-- 型クラス: Functor, Monoid, Monad, etc..
+- 型クラス: Num, Eq, Functor, Monoid, Monad, etc..
 
 ^ 興味あったらこの辺のキーワードから調べていくと良いです
-^ まずはMaybeあたり触ってみると良いでしょう
+まずはMaybeあたり触ってみると良いでしょう
 
 ---
 
