@@ -11,8 +11,8 @@ slidenumbers: true
 
 - 泉 雅彦(@mizmarine)
 - 株式会社VOYAGE GROUP 2015入社
-  - 広告業界４年目になりました
-  - Scala / Golang で広告配信書いてます
+  - 広告業界４年目
+  - Scala / Golang で 配信サーバ
 - Like
   - :computer: Python / Scala
   - :runner: 脱出ゲーム
