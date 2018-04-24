@@ -312,7 +312,24 @@ theme: Plain Jane, 3
 
 ---
 
-# AWS Media Services でつくる動画配信サービス
+# AWS Media Services でつくる
+# 動画配信サービス
+
+---
+
+# how to create
+
+具体的な方法は わかりやすいチュートリアル記事があるのでそちらを参照してください
+
+20180123 20分でlive配信aws media services（media live mediapackage）_pub
+https://www.slideshare.net/KamedaHarunobu/20180123-20liveaws-media-servicesmedia-live-mediapackagepub
+
+【やってみた】AWS Elemental MediaLiveとAWS Elemental MediaPackageでライブ配信してみた
+https://dev.classmethod.jp/cloud/aws/reinvent2017-awselemental-medialive-mediapackage-livestreaming/
+
+【やってみた】AWS Elemental MediaLiveとAWS Elemental MediaStoreでライブ配信してみた
+https://dev.classmethod.jp/cloud/aws/reinvent2017-awselemental-medialive-mediastore-livestreaming/
+
 
 ---
 
@@ -323,7 +340,7 @@ theme: Plain Jane, 3
 - MediaLive * MediaPackage
 - MediaLive * MediaStore
 
-これらを同時につくることもできる
+同時に両方つなぐこともできる
 
 ---
 
@@ -339,51 +356,212 @@ theme: Plain Jane, 3
 
 ---
 
+# どう使い分けるか？
+
+---
+
 # MediaPackage vs MediaStore
 
-どう使い分けるのか？
 
-- AVRつかいたかったら MediaPackage
+- ABR機能つかいたかったら MediaPackage
 - 3日以上の/明示的なアーカイブしたかったら MediaStore
 
-設定簡単なのはMediaStoreかなー
+経験上、設定簡単なのはMediaStore
 
+公式FAQ
 https://aws.amazon.com/jp/mediastore/features/
 
 ---
 
-スクショベースでやってきか
-デモするでもいいか？
-OBS
+# MediaLive * MediaPackageの場合
 
-- デモ的な
-  - 出力先からつくるよ
-    - mp channel
-    - mp endpoint
-    - ml inut
-    - ml channel
+配信先（MediaPackage）作ってから 入力（MediaLive）作っていきます
 
-- 柔軟配信系
-  - MediaLive * MediaPackage
-    - 設定編
-      - MediaLiveの設定が鬼
-        - 設定項目の多さよ
-      - リソースの依存の多さ
-        - フルマネージドとはいえ 最低限の知識は必要
-        - roleとかsecurity group とか
-    - 運用編
-      - channel runningまで時間かかる -> hot standbyがよい
-      - medialive のchannel上限
-      - CDN設定しましょう
-    - 金額編
-      - outputgroups 数課金
-      - channel ON の間課金
-      - inputの設定で課金額変わる
-- 動画アーカイブ配信系
-  - MediaLive * MediaStore
-    - 設定編
-      - mediastoressl://
-    - 運用編
-      - outputgroups HLS設定
-      - channel を stopしないとmode変わらない
-      - CDN設定ミスるとずっとliveのままでアーカイブ見れません
+- MediaPackage channel
+- MediaPackage endpoint
+- MediaLive input
+- MediaLive channel
+
+---
+
+# ここから
+# チュートリアルを終えて
+# 僕がハマった道を振り返ります
+
+---
+
+# チュートリアルはクリアした
+# 概念は理解したぞ！
+
+---
+
+# でもリソース手動で作るの面倒
+
+---
+
+# API叩いて作れるようにしたいぞ!
+
+---
+
+# 依存リソースが多い...
+
+---
+
+# 依存リソースが多い...
+
+- security group や アクセス権のparameter store など
+  - それぞれをcreateできるroleが必要に
+- リソース削除したい場合、事前に依存リソース削除する必要あり
+  - ex. channel消してから -> input削除
+  - channel削除に時間かかるので、state監視が必須
+
+---
+
+# 関連リソースは把握した！
+
+---
+
+# MediaLive
+# 設定項目数が半端ない...
+
+---
+
+# MediaLive設定項目数が半端ない...
+
+動画、音声変換設定から 出力方法の設定まで大量にある
+
+- 試しに見てみよう
+
+```
+aws medialive create-channel --generate-cli-skeleton
+```
+
+---
+
+
+# MediaLive設定項目数が半端ない...
+
+![inline fit](./images/tips/too_large_ml_setting_1.png)
+
+---
+
+
+# MediaLive設定項目数が半端ない...
+
+![inline fit](./images/tips/too_large_ml_setting_2.png)
+
+---
+
+
+# MediaLive設定項目数が半端ない...
+
+- チュートリアルで作成した設定を確認、利用するのがお勧め
+  - ただし別の落とし穴が..（後述
+
+```
+aws medialive describe-channel
+```
+
+---
+
+---
+
+# リソース作成処理できた！
+# 事前に複数チャンネル並べてよう！
+
+---
+
+# 途中からリソース作れなくなった...
+
+---
+
+
+# 途中からリソース作れなくなった...
+
+
+![inline](./images/tips/ml_limitation.png)
+
+---
+
+# 途中からリソース作れなくなった...
+
+
+- デフォルト medialive のchannel上限 = 5
+- サポート投げて上限緩和しましょう
+
+---
+
+# 複数チャンネル並べられる！
+# ライブしたいときにstartするだけ！
+
+---
+
+# channel runningまで時間かかる...
+
+---
+
+# channel runningまで時間かかる
+
+- リソース作成に数分かかるのはわかる
+- MediaLive channel の開始にも数分かかる
+  - 経験上、時間帯によってrunningまでに時間差がある
+  - ライブしたい時間帯に併せて hot standby することに
+
+---
+
+# 複数hot standyできた!
+
+---
+
+# mediaStore使って
+# アーカイブもしてみたい
+
+---
+
+# MediaStoreに格納はできたが
+# ライブモードでしか利用できない...
+
+---
+
+# ライブモードでしか利用できない...
+
+- MediaLive設定の outputgroups HLS設定
+  - モード指定「Live / VOD」 がある
+- MediaLive channel stop 時に プレイリストファイルの mode が `EVENT` から VOD に書き換わるようになる
+- 下手にCDN設定すると `EVENT` でキャッシュされてしまう
+  - セグメントファイルは長時間キャッシュ持っても良い
+  - プレイリストファイルはキャッシュ間隔短めに
+
+---
+
+# ライブ配信とアーカイブ
+# できるようになった
+
+---
+
+# 料金が異常に高騰...
+
+---
+
+# 料金が異常に高騰...
+
+- MediaLive料金体系
+  - https://aws.amazon.com/jp/medialive/pricing/
+- runningな間は inputなくても 配信中課金
+- OutputGroups 出力先１つごとに課金される
+  - HLSのテンプレート、出力先10コ使ってる
+- input bitrate も実際の使用量でなく 設定値を見て課金されている
+
+---
+
+# などなど様々な経験を経て
+# 無事運用できるようになりました！
+
+---
+
+# まとめ
+
+- AWS Media Services は フルマネージドな動画関連サービス
+- インフラ周り気にすることがかなり減るのは大きなメリット
+- ハマりどころも多いですが アプリケーションエンジニア一人で動画配信作れるのスゴイと思う
+- 興味持った方は是非共に学んでいきましょう
