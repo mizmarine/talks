@@ -452,17 +452,19 @@ aws medialive create-channel --generate-cli-skeleton
 
 ---
 
+# **671**
+
+---
 
 # MediaLive設定項目数が半端ない...
 
 - チュートリアルで作成した設定を確認、利用するのがお勧め
-  - ただし別の落とし穴が..（後述
 
 ```
 aws medialive describe-channel
 ```
 
----
+- ただし別の落とし穴も..（後述
 
 ---
 
@@ -502,6 +504,14 @@ aws medialive describe-channel
 
 # channel runningまで時間かかる
 
+MediaLive channel のstate
+
+図
+
+---
+
+# channel runningまで時間かかる
+
 - リソース作成に数分かかるのはわかる
 - MediaLive channel の開始にも数分かかる
   - 経験上、時間帯によってrunningまでに時間差がある
@@ -513,7 +523,7 @@ aws medialive describe-channel
 
 ---
 
-# mediaStore使って
+# MediaStore使って
 # アーカイブもしてみたい
 
 ---
@@ -525,9 +535,18 @@ aws medialive describe-channel
 
 # ライブモードでしか利用できない...
 
+- HLSにおいて ライブかアーカイブかは `EXT-X-PLAYLIST-TYPE` 項目で判断
+
+![inline](./images/tips/hls_playlist_type.png)
+
+
+---
+
+# ライブモードでしか利用できない...
+
 - MediaLive設定の outputgroups HLS設定
   - モード指定「Live / VOD」 がある
-- MediaLive channel stop 時に プレイリストファイルの mode が `EVENT` から VOD に書き換わるようになる
+- MediaLive channel stop 時に プレイリストファイルの 項目 が `EVENT` から VOD に書き換わるようになる
 - 下手にCDN設定すると `EVENT` でキャッシュされてしまう
   - セグメントファイルは長時間キャッシュ持っても良い
   - プレイリストファイルはキャッシュ間隔短めに
