@@ -32,22 +32,21 @@ theme: Plain Jane, 3
 
 ---
 
-# Introduction
+# 1.Introduction
 
-### このトークの目的
-
----
-
-# 動画配信 は手軽にできる！
+### -伝えたいこと-
 
 ---
 
-# 動画配信サービスの隆盛
+# ライブ動画配信は
+# 手軽にできるようになった
+
+---
+
+# ライブ動画配信サービスの隆盛
 
 - 動画投稿/生配信
   - YouTube, ニコニコ動画, ..
-- ビデオオンデマンド
-  - Netflix, Hulu, Amazon prime video,...
 - 個人配信
   - instagram ストーリー, facebook live, ...
 - ライブコマース
@@ -55,22 +54,37 @@ theme: Plain Jane, 3
 
 ---
 
+# エンジニアとして
+# 触ってみたいぞ
+
+---
+
 # 技術的に難しそう...
 
 - 大量の専門用語
   - Live / VOD, HLS / MPEG2-DASH, RTP / RTMP, ...
-- いわゆる WEBサービス開発とは異なる技術領域
-  - api サーバでjson返そう、とは別のパラダイム
-- ライブ配信ではリアルタイム性も問題に
+- WEBサービス開発とは異なる技術領域
+  - apiサーバが json返して〜とは別のパラダイム
+- リアルタイム性も問題に
   - ライブストリームのインフラ遅延からリアルタイムウェブまで
+
 
 ---
 
-# AWS Media Services 発表
+# そんなとき現れたのが
 
-- re:Invent2017で発表された 動画関連の新しい５つのサービス
+---
+
+![fit](./images/mediaservices.jpg)
+
+---
+
+# AWS Media Services
+
+- 動画関連の新しい５つのサービス
+  - 2017.11 re:Invent2017で発表
   - 2018.02 には東京リージョンでも利用可能に
-- 組み合わせればフルマネージドでライブ配信できるサービスも
+- 組み合わせればライブ配信できるサービスも
 
 ---
 
@@ -78,33 +92,41 @@ theme: Plain Jane, 3
 
 ---
 
-# 触ってみた
+# 早速触ってみた
+
+---
+
+# 触ってみた感想
 
 - ちょっとした動画配信は **１時間もあれば作れた**
-  - 動画配信の用語に馴染みがないと 勝手がわからないところもある
+  - 用語に馴染みがないと 勝手わからない部分も
 - 触ってみた経験を元に概要を解説
   - 併せて色々なハマりどころをご紹介
-- AWS Media Services に興味を持つ人が増えると幸い
+- AWS Media Services おもしろいよ！
 
 ---
 
-# 動画配信の基本
+# 2.動画配信の基本
+
+### -雰囲気をつかもう-
 
 ---
 
-# ざっくり概念図
+# 重要ワード
 
-図
-
----
-
-# 以下を押さえよう
-
-これがわかれば AWS Media Services の雰囲気をつかめる
+AWS Media Services の雰囲気をつかむために
 
 - Live / Video On Demand
 - HTTP Live Streaming
 - Adaptive BitRate
+
+---
+
+![fit](./images/basic/workflow.png)
+
+---
+
+![fit](./images/basic/workflow_detailed.png)
 
 ---
 
@@ -116,17 +138,24 @@ theme: Plain Jane, 3
 - 終わりがわかっているかどうか、が大きな違い
   - アーカイブは事前に変換できる
   - ライブ配信中にそのアーカイブを後追い再生というややこしいケースも
+- ライブストリームは RTP や RTMP というプロトコルで送受信される
 
 ^Live配信は入力されるストリームを常に変換しながら配信する必要がある
 ^一方VOD配信はコンテンツが事前にわかっているが、コンテンツの持ち方を工夫しないとストレージがすぐにいっぱいに
 
 ---
 
+![fit](./images/basic/live_vod.png)
+
+---
+
 # HTTP Live Streaming(HLS)
 
 - 動画コンテンツをすべてDLしてから再生するのは時間がかかる
-- 数秒毎に分割して少しずつダウンロードと再生を繰り返す
+- 数秒毎に分割、少しずつDLと再生を繰り返す
   - ストリーミング再生
+- 最新コンテンツを少しずつ配信できるのでライブと相性◯
+- HTTPプロトコル上でストリーミング再生を可能としたのがHLS
 
 ---
 
@@ -140,12 +169,9 @@ theme: Plain Jane, 3
 - 参考
   - https://dev.classmethod.jp/tool/http-live-streaming/
 
-
 ---
 
-# HLSの仕組み
-
-図
+![fit](./images/basic/hls_workflow.png)
 
 ---
 
@@ -160,31 +186,40 @@ theme: Plain Jane, 3
 
 ---
 
+![fit](./images/basic/abr_workflow.png)
+
+---
+
 # ABR対応するために
 
 - 各ビットレートでの動画コンテンツが必要となる
   - 事前に変換処理しておき、必要なものを使う
 - ライブ配信では事前に全容を知れないがどうする？
-  - オリジナルとなるストリームのセグメントを各ビットレートごとに変換して利用
+  - オリジナルとなるストリームのセグメントを各ビットレートごとに変換
 
 - 参考
   - https://dev.classmethod.jp/cloud/aws/elastic-transcode-mpeg-dash-abr/
 
 ---
 
-# ざっくり概念図（再掲）
 
-図
-
----
-
-# 話した点を追加するとこう
-
-図
+![fit](./images/basic/abr_live.png)
 
 ---
 
-# AWS Media Services?
+# これらをすべて自前で作るのは大変
+
+
+- 動画の変換処理からホスティングまで気にする必要あり
+  - よく利用されるのは Wowza Stream Engine あたり
+  - 敷居が高い...
+- そこに現れた AWS Media Services
+
+---
+
+# 3. AWS Media Services?
+
+### -サービス概要紹介-
 
 ---
 
@@ -312,23 +347,10 @@ theme: Plain Jane, 3
 
 ---
 
-# AWS Media Services でつくる
+# 4. AWS Media Services でつくる
 # 動画配信サービス
 
----
-
-# how to create
-
-具体的な方法は わかりやすいチュートリアル記事があるのでそちらを参照してください
-
-20180123 20分でlive配信aws media services（media live mediapackage）_pub
-https://www.slideshare.net/KamedaHarunobu/20180123-20liveaws-media-servicesmedia-live-mediapackagepub
-
-【やってみた】AWS Elemental MediaLiveとAWS Elemental MediaPackageでライブ配信してみた
-https://dev.classmethod.jp/cloud/aws/reinvent2017-awselemental-medialive-mediapackage-livestreaming/
-
-【やってみた】AWS Elemental MediaLiveとAWS Elemental MediaStoreでライブ配信してみた
-https://dev.classmethod.jp/cloud/aws/reinvent2017-awselemental-medialive-mediastore-livestreaming/
+### -触って出会った落とし穴たち-
 
 
 ---
@@ -341,18 +363,6 @@ https://dev.classmethod.jp/cloud/aws/reinvent2017-awselemental-medialive-mediast
 - MediaLive * MediaStore
 
 同時に両方つなぐこともできる
-
----
-
-# MediaLive * MediaPackage
-
-図
-
----
-
-# MediaLive * MediaStore
-
-図
 
 ---
 
@@ -370,6 +380,21 @@ https://dev.classmethod.jp/cloud/aws/reinvent2017-awselemental-medialive-mediast
 
 公式FAQ
 https://aws.amazon.com/jp/mediastore/features/
+
+---
+
+# Getting Started
+
+具体的な方法は わかりやすいチュートリアル記事があるのでそちらを参照してください
+
+20180123 20分でlive配信aws media services（media live mediapackage）_pub
+https://www.slideshare.net/KamedaHarunobu/20180123-20liveaws-media-servicesmedia-live-mediapackagepub
+
+【やってみた】AWS Elemental MediaLiveとAWS Elemental MediaPackageでライブ配信してみた
+https://dev.classmethod.jp/cloud/aws/reinvent2017-awselemental-medialive-mediapackage-livestreaming/
+
+【やってみた】AWS Elemental MediaLiveとAWS Elemental MediaStoreでライブ配信してみた
+https://dev.classmethod.jp/cloud/aws/reinvent2017-awselemental-medialive-mediastore-livestreaming/
 
 ---
 
@@ -403,14 +428,19 @@ https://aws.amazon.com/jp/mediastore/features/
 
 ---
 
-# 依存リソースが多い...
+# しかし
 
 ---
 
-# 依存リソースが多い...
+# 思ったより依存リソースが多い...
 
-- security group や アクセス権のparameter store など
-  - それぞれをcreateできるroleが必要に
+---
+
+# 思ったより依存リソースが多い...
+
+- UIから意識しづらい項目も多数
+  - security group や アクセス権のparameter store など
+  - それぞれをcreateできるroleも必要に
 - リソース削除したい場合、事前に依存リソース削除する必要あり
   - ex. channel消してから -> input削除
   - channel削除に時間かかるので、state監視が必須
@@ -418,6 +448,11 @@ https://aws.amazon.com/jp/mediastore/features/
 ---
 
 # 関連リソースは把握した！
+
+
+---
+
+# しかし
 
 ---
 
@@ -464,12 +499,16 @@ aws medialive create-channel --generate-cli-skeleton
 aws medialive describe-channel
 ```
 
-- ただし別の落とし穴も..（後述
+- (ただし別の落とし穴も..（後述
 
 ---
 
 # リソース作成処理できた！
 # 事前に複数チャンネル並べてよう！
+
+---
+
+# しかし
 
 ---
 
@@ -498,28 +537,36 @@ aws medialive describe-channel
 
 ---
 
+# しかし
+
+---
+
 # channel runningまで時間かかる...
 
 ---
 
 # channel runningまで時間かかる
 
-MediaLive channel のstate
+![inline](./images/tips/channel_state_list.png)
 
-図
+---
+
+![fit](./images/tips/channel_states.png)
 
 ---
 
 # channel runningまで時間かかる
 
-- リソース作成に数分かかるのはわかる
-- MediaLive channel の開始にも数分かかる
+- リソース作成(CREATING)に数分かかるのはわかる
+- channel の開始(STARTING)にも数分かかる
   - 経験上、時間帯によってrunningまでに時間差がある
   - ライブしたい時間帯に併せて hot standby することに
+  - アプリケーションレイヤでチャンネルID管理対応
 
 ---
 
-# 複数hot standyできた!
+# 複数channel
+# hot standbyできた!
 
 ---
 
@@ -528,17 +575,33 @@ MediaLive channel のstate
 
 ---
 
-# MediaStoreに格納はできたが
+# MediaPacakgeと同じ感覚で
+# MediaStoreに格納できた
+
+---
+
+# しかし
+
+---
+
 # ライブモードでしか利用できない...
 
 ---
 
 # ライブモードでしか利用できない...
 
+- ライブ終了しているはずなのに過去データを視聴できない
+    - まっくら
+    - 確かに今はライブしてないけど...
+
+---
+# ライブモードでしか利用できない...
+
 - HLSにおいて ライブかアーカイブかは `EXT-X-PLAYLIST-TYPE` 項目で判断
+  - `VOD` だと アーカイブモード
+  - これがずっと `EVENT` のままだった
 
-![inline](./images/tips/hls_playlist_type.png)
-
+![fit right](./images/tips/hls_playlist_type.png)
 
 ---
 
@@ -553,8 +616,21 @@ MediaLive channel のstate
 
 ---
 
+
+![fit](./images/tips/hls_vod_mode.png)
+
+---
+
+![fit](./images/tips/hls_vod_mode_anotated.png)
+
+---
+
 # ライブ配信とアーカイブ
-# できるようになった
+# できるようになった！
+
+---
+
+# しかし
 
 ---
 
@@ -566,10 +642,10 @@ MediaLive channel のstate
 
 - MediaLive料金体系
   - https://aws.amazon.com/jp/medialive/pricing/
-- runningな間は inputなくても 配信中課金
-- OutputGroups 出力先１つごとに課金される
-  - HLSのテンプレート、出力先10コ使ってる
-- input bitrate も実際の使用量でなく 設定値を見て課金されている
+- runningな間は **inputなくても配信中と同じ課金形態**
+- Outputは **出力先１つごとに課金**
+  - HLSのデフォルトテンプレート、出力先10コ使ってる
+- input bitrateは 実際の使用量でなく 設定値を見て課金されている
 
 ---
 
