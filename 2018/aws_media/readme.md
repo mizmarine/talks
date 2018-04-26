@@ -2,9 +2,10 @@ autoscale: true
 slidenumbers: true
 theme: Plain Jane, 3
 
-## AWS Media Services でつくる
-## ライブ動画配信システム
-#### @mizmarine
+# AWS Media Services でつくる
+# ライブ動画配信システム
+
+## @mizmarine
 
 ---
 
@@ -12,7 +13,7 @@ theme: Plain Jane, 3
 
 ![right](./images/face.jpg)
 
-- 泉 雅彦(@mizmarine)
+- みずまり(@mizmarine)
 - 広告業界４年目
   - Scala/Golang で 広告配信サーバ書いてる
 - Like
@@ -67,7 +68,6 @@ theme: Plain Jane, 3
   - apiサーバが json返して〜とは別のパラダイム
 - リアルタイム性も問題に
   - ライブストリームのインフラ遅延からリアルタイムウェブまで
-
 
 ---
 
@@ -208,7 +208,6 @@ AWS Media Services の雰囲気をつかむために
 ---
 
 # これらをすべて自前で作るのは大変
-
 
 - 動画の変換処理からホスティングまで気にする必要あり
   - よく利用されるのは Wowza Stream Engine あたり
@@ -352,7 +351,6 @@ AWS Media Services の雰囲気をつかむために
 
 ### -触って出会った落とし穴たち-
 
-
 ---
 
 # 構成パターン
@@ -372,11 +370,11 @@ AWS Media Services の雰囲気をつかむために
 
 # MediaPackage vs MediaStore
 
-
-- ABR機能つかいたかったら MediaPackage
+- 複数デバイスの対応やDRM追加したかったら MediaPackage
 - 3日以上の/明示的なアーカイブしたかったら MediaStore
 
-経験上、設定簡単なのはMediaStore
+設定簡単なのはMediaStore
+配信デバイス固定であればこちらで良いと思う
 
 公式FAQ
 https://aws.amazon.com/jp/mediastore/features/
