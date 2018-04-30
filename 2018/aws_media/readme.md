@@ -5,7 +5,7 @@ theme: Plain Jane, 3
 # AWS Media Services でつくる
 # ライブ動画配信システム
 
-## @mizmarine
+## みずまり@mizmarine
 
 ---
 
